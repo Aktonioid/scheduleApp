@@ -54,7 +54,8 @@ public class Habit {
     @Column(name = "success_habits")
     private int successesHabits; // сколько раз пользователь выполнил цель по привычке(за день)
     @Column()
-    private int faliures; // сколько раз пользователь не выполнил цели по привычке (за день)
+    private int failures; // сколько раз пользователь не выполнил цели по привычке (за день)
+    // надо переписать на более грамотный вид
     @Override
     public String toString() {
         return "habitName=" + habitName +"; habitGoal=" + habitGoal;

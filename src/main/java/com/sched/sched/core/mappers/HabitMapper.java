@@ -34,7 +34,7 @@ public class HabitMapper {
             model.getHabitExpirationDate(),
             model.getHabitBeginingDate(),
             model.getSuccessesHabits(), 
-            model.getFaliures()
+            model.getFailures()
         );
     }
     

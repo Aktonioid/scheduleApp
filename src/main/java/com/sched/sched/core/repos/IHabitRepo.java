@@ -20,4 +20,5 @@ public interface IHabitRepo
     // скидывает все привычки, которые попадают в дату и обновляет их информацию о провале привычки на день или о её успехе
     public boolean updateHabitStatusAndStatistics(Date date);
 
+    public boolean setHabitStatusToFalseById(UUID habitId);
 }
