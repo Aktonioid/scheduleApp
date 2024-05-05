@@ -110,8 +110,8 @@ public class HabitRepo implements IHabitRepo{
 
         update.where(cb.equal(root.get("id"), habit.getId()));
 
-        update.set("habitBeginingDate", habit.getHabitBeginingDate()); // обновить дату начала привычки
-        update.set("habitExpirationDate", habit.getHabitExpirationDate()); // обновить дату окончания привычки
+        update.set(root.get("habitBeginingDate"), habit.getHabitBeginingDate()); // обновить дату начала привычки
+        update.set(root.get("habitExpirationDate"), habit.getHabitExpirationDate().getTime()); // обновить дату окончания привычки
         update.set("habitName", habit.getHabitName()); // обновить habitName
         update.set("habitGoal", habit.getHabitGoal()); // обновить habitGoal
 
@@ -179,8 +179,8 @@ public class HabitRepo implements IHabitRepo{
         Root<Habit> root = cu.from(Habit.class); 
 
 
-        cu.set("todaySuccess", true); // обновление статуса привычки
-        cu.set("successesHabits", "successesHabits+1"); // обновление счетчика привычки
+        cu.set(root.get("todaySuccess"), true); // обновление статуса привычки
+        // cu.set("successesHabits", "successesHabits+1"); // обновление счетчика привычки
 
         cu.where(cb.equal(root.get("id"), habitId));
 
@@ -225,8 +225,12 @@ public class HabitRepo implements IHabitRepo{
 
         //
         // настройка обновления проваленых привычек
-        //
-        updateFailedHabits.set("failures", "faliures+1");
+        //  
+        // updateFailedHabits.set(failuresRoot.get("failures"), 
+        //     cb.sum(failuresRoot.get("failures"), 1));
+
+        updateFailedHabits.set("failures", 
+            cb.sum(failuresRoot.get("failures"), 1));
 
         updateFailedHabits.where(cb.and(
             cb.lessThanOrEqualTo(failuresRoot.<Date>get("habitBeginingDate"), date),
@@ -239,13 +243,15 @@ public class HabitRepo implements IHabitRepo{
         //
         // настройка обновления успешных привычек
         //
-        updateSuccessHabits.set("successesHabits", "successesHabits+1");
-        updateSuccessHabits.set("todaySuccess", false);
+        updateSuccessHabits.set("successesHabits", 
+            cb.sum(successRoot.get("successesHabits"), 1) );
+        
+        updateSuccessHabits.set(successRoot.get("todaySuccess"), false);
 
         updateSuccessHabits.where(cb.and(
             cb.lessThanOrEqualTo(successRoot.<Date>get("habitBeginingDate"), date),
             cb.greaterThanOrEqualTo(successRoot.<Date>get("habitExpirationDate"), date),
-            cb.equal(successRoot, failuresRoot)
+            cb.equal(successRoot.get("todaySuccess"), true)
         ));
         //настройка обновления успешных привычек окончена
 
@@ -329,6 +335,21 @@ public class HabitRepo implements IHabitRepo{
         }
 
         return true;
+    }
+
+    @Override
+    public boolean setHabitStatusToFalseById(UUID habitId) {
+        // TODO Auto-generated method stub
+        Session session = sessionFactory.openSession();
+        CriteriaBuilder cb = session.getCriteriaBuilder();
+        CriteriaUpdate<Habit> cq = cb.createCriteriaUpdate(Habit.class);
+        Root<Habit> root = cq.from(Habit.class);
+
+        cq.set(root.get("todaySuccess"), false);
+
+        cq.where(cb.equal(root.get("id"), habitId));
+
+        throw new UnsupportedOperationException("Unimplemented method 'setHabitStatusToFalseById'");
     }
 
     

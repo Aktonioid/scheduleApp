@@ -1,7 +1,5 @@
 package com.sched.sched.core.mappers;
 
-import java.time.LocalTime;
-
 import com.sched.sched.core.dtos.ActivityDto;
 import com.sched.sched.core.models.Activity;
 import com.sched.sched.core.models.UserModel;
