@@ -341,15 +341,40 @@ public class HabitRepo implements IHabitRepo{
     public boolean setHabitStatusToFalseById(UUID habitId) {
         // TODO Auto-generated method stub
         Session session = sessionFactory.openSession();
+        Transaction transaction = session.getTransaction();
         CriteriaBuilder cb = session.getCriteriaBuilder();
-        CriteriaUpdate<Habit> cq = cb.createCriteriaUpdate(Habit.class);
-        Root<Habit> root = cq.from(Habit.class);
+        CriteriaUpdate<Habit> update = cb.createCriteriaUpdate(Habit.class);
+        Root<Habit> root = update.from(Habit.class);
 
-        cq.set(root.get("todaySuccess"), false);
+        update.set(root.get("todaySuccess"), false);
 
-        cq.where(cb.equal(root.get("id"), habitId));
+        update.where(cb.equal(root.get("id"), habitId));
 
-        throw new UnsupportedOperationException("Unimplemented method 'setHabitStatusToFalseById'");
+        try{
+            transaction.begin();
+
+            session.createMutationQuery(update).executeUpdate();
+
+            transaction.commit();
+        }
+        catch(HibernateException e){
+            transaction.rollback();
+            logger.error(e.getLocalizedMessage(), e);
+            e.printStackTrace();
+            session.close();
+            return false;
+        }
+        catch(Exception e){
+            transaction.rollback();
+            logger.error(e.getLocalizedMessage(), e);
+            e.printStackTrace();
+            session.close();
+            throw e;
+        }
+
+        session.close();
+
+        return true;
     }
 
     

@@ -43,3 +43,5 @@ out/
 *.properties
 *.log
 *.gz
+
+applicationLog

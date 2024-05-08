@@ -26,10 +26,8 @@ public class UserModelDto {
     private int successesHabits; // сколько раз пользователь выполнил цель по привычке(за день)
     private int faliures; // сколько раз пользователь не выполнил цели по привычке (за день) 
 
-    private boolean isVerificated;
-
     public UserModelDto(UUID id, String username, String password, String name, String surname, String email,
-                        boolean isRegisterCompleted, boolean isVerificated){
+                        boolean isRegisterCompleted){
 
         this.id = id;
         this.username = username;
@@ -38,6 +36,5 @@ public class UserModelDto {
         this.surname = surname; 
         this.email = email;
         this.isRegisterCompleted = isRegisterCompleted;
-        this.isVerificated = isVerificated;
     }
 }

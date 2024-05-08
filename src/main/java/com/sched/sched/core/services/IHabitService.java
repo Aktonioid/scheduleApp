@@ -17,5 +17,5 @@ public interface IHabitService {
     public CompletableFuture<HabitDto> getHabitById(UUID habitId);
     public CompletableFuture<List<HabitDto>> getAllHabitsByUserId(UUID userID);
     public CompletableFuture<List<HabitDto>> getAllHabitsByUserId(UUID id, Date date);
-
+    public CompletableFuture<HabitStatus> setHabitStatusToFalse(UUID habitId);
 }

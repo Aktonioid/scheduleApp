@@ -6,6 +6,7 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Date;
 import java.util.UUID;
+import java.util.List;
 
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
@@ -144,6 +145,7 @@ public class HabitRepoTests {
 
   @Test
   // просто прописать обновление статуса привычки, потом получить привычки по id  и проверить статус на true
+  
   public void HabitRepo_updateHabitStatus(){
     habitRepo.updateHabitStatus(habitId);
 
@@ -199,5 +201,36 @@ public class HabitRepoTests {
     boolean result = habitRepo.deleteHabitById(createdHabitId);
 
     assertEquals(true, result);
+  }
+
+  @Test
+  public void HabitRepo_getHabitsByDay(){
+
+    LocalDate localDate = LocalDate.now();
+    Date date = Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
+
+    List<Habit> habitsResult = habitRepo.getHabitsByDay(date, userId);
+
+    boolean result = habitsResult.size() > 0;
+
+    assertEquals(true, result);
+  }
+  @Test
+  public void HabitRepo_getHabitsByUserId(){
+
+    List<Habit> habitsResult = habitRepo.getHabitsByUserId(userId);
+
+    boolean result = habitsResult.size() > 0;
+
+    assertEquals(true, result);
+  }
+  @Test
+  public void HabitRepo_setHabitStatusToFalseById(){
+    
+    habitRepo.setHabitStatusToFalseById(habitId);
+
+    Habit habitAfterUpdate = habitRepo.getHabitById(habitId);
+
+    assertEquals(false, habitAfterUpdate.isTodaySuccess());
   }
 }

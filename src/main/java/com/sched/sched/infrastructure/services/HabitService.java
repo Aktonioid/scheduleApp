@@ -204,5 +204,23 @@ public class HabitService implements IHabitService {
         });
     }
 
+    @Override
+    @Async
+    public CompletableFuture<HabitStatus> setHabitStatusToFalse(UUID habitId) {
+        return CompletableFuture.supplyAsync(() -> {
+            HabitStatus status = new HabitStatus();
+
+            if(!habitRepo.checkIfAHabitExhistById(habitId)){
+                status.setHabitExhist(false); // по умолчанию false по идее, но так, на всякий
+                
+                return status;
+            }
+            
+            status.setHabitExhist(true);
+
+            return status;
+        });
+    }
+
     
 }

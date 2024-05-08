@@ -367,4 +367,24 @@ public class UserRepo implements IUserRepo{
 
         return email;
     }
+
+    @Override
+    public boolean checkIsUserExhistByUUID(UUID userId) {
+        // TODO Auto-generated method stub
+        Session session = sessionFactory.openSession();
+        CriteriaBuilder cb = session.getCriteriaBuilder();
+        CriteriaQuery<UserModel> cq = cb.createQuery(UserModel.class);
+        Root<UserModel> root = cq.from(UserModel.class);
+
+        cq.select(root).where(root.get("id").in(userId));
+
+        boolean isExhist = false;
+
+        if(session.createQuery(cq).uniqueResult() != null){
+            isExhist = true;
+        }
+
+        session.close();
+        return isExhist;
+    }
 }

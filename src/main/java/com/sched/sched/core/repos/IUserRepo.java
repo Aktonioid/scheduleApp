@@ -12,6 +12,7 @@ public interface IUserRepo {
     public boolean deleteUser(UUID id);
     public boolean checkIsUserExhistsByEmail(String email);
     public boolean checkIsUserExhistsByusername(String username);
+    public boolean checkIsUserExhistByUUID(UUID userId);
     public List<UserModel> getAllUsersByPage(int page);
     public UserModel getUserById(UUID id);
     public UserModel getUserByEmail(String email);

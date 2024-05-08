@@ -184,7 +184,7 @@ public class HabitController {
         return ResponseEntity.ok(habits);
     }
 
-    @PutMapping("/updatestatus/{habitId}")
+    @PutMapping("/updatestatus/true/{habitId}")
     public ResponseEntity<String> updateHabitStatusById(UUID habitId){
         
         HabitStatus status = null;
@@ -204,5 +204,25 @@ public class HabitController {
 
         return ResponseEntity.ok(null);
     }
+
+    @PostMapping("/updatestatus/false/{habitId}")
+    public ResponseEntity<String> setHabitStatusToFasle(@PathVariable UUID haibitId){
+
+        HabitStatus status = null;
+
+        try {
+            status = habitService.setHabitStatusToFalse(haibitId).get();
+        } catch (InterruptedException | ExecutionException e) {
+            logger.error(e.getLocalizedMessage(), e);
+            e.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+        if(!status.isHabitExhist()){
+            return ResponseEntity.notFound().build();
+        }
+
+        return ResponseEntity.ok(null);
+    } 
 
 }
