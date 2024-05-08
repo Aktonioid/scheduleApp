@@ -18,4 +18,5 @@ public interface IUserService {
                                                                 UserModelDto user);
     public CompletableFuture<UserModelDto> getUserModelByEmail(String email);
     public CompletableFuture<Boolean> updateUserModel(UserModelDto userModel);
+    
 }

@@ -61,10 +61,6 @@ public class UserModel implements UserDetails{
     // @Column(name = "failure_habbits")
     // private int faliureHabits; // сколько раз пользователь не выполнил цели по привычке (за день) 
     
-    @Column(name = "is_verificated")
-    @Convert(converter = YesNoConverter.class)
-    private boolean isVerificated;
-    
     
     public UserModel(UUID id){
         this.id = id;

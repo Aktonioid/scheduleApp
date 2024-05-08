@@ -15,8 +15,7 @@ public class UserModelMapper {
             dto.getEmail(),
             dto.isRegisterCompleted(),
             null,
-            null,
-            dto.isVerificated()
+            null
         );
     }
     public static UserModelDto asDto(UserModel model)
@@ -28,8 +27,7 @@ public class UserModelMapper {
             model.getName(),
             model.getSurname(),
             model.getEmail(),
-            model.isRegisterCompleted(),
-            model.isVerificated()
+            model.isRegisterCompleted()
         );
     }
 }

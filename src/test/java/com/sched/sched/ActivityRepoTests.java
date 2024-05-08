@@ -53,6 +53,7 @@ public class ActivityRepoTests {
 
         activityForDelete = activity.getId();
 
+        activityRepo.deleteActivityById(activityForDelete);
 
         assertEquals(true, result); 
     }
@@ -94,13 +95,6 @@ public class ActivityRepoTests {
         Activity result = activityRepo.getActivityById(activityIdForOtherTests);
 
         boolean res = false;
-
-        System.out.println(result.getActivityDate().getTime() +"   " + date.getTime());
-        System.out.println(result.getActivityDescription() +"   " + testActivity.getActivityDescription());
-        System.out.println(result.getActivityLocation() +"   " + testActivity.getActivityLocation());
-        System.out.println(result.getActivityName() +"   " + testActivity.getActivityName());
-        System.out.println(result.getId() +"   " + testActivity.getId());
-        System.out.println(result.getUser().getId() +"   " + testActivity.getUser().getId());
 
 
         if( result.getActivityDate().getTime() == date.getTime() &&

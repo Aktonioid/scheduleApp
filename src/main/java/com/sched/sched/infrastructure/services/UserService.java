@@ -25,8 +25,6 @@ public class UserService implements IUserService {
 
     @Autowired
     IUserRepo userRepo;
-    
-
 
     @Override
     @Async
