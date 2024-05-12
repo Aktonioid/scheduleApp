@@ -1,6 +1,7 @@
 package com.sched.sched.infrastructure.services;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.text.DateFormat;
 import java.util.List;
@@ -69,7 +70,7 @@ public class UserEmailService implements IEmailService{
             for(int i = 0; i < pageCount;i++){
 
                 
-                List<UserModel> users = userRepo.getUsersModelsWithDateHabitByPage(date, i, pageSize);
+                List<UserModel> users = new ArrayList<>(userRepo.getUsersModelsWithDateHabitByPage(date, i, pageSize));
                 date.getTime();
                 for(UserModel model : users){
                     String content = model.getHabits().toString()
@@ -115,7 +116,7 @@ public class UserEmailService implements IEmailService{
             for(int i = 0; i < pageCount;i++){
 
                 
-                List<UserModel> users = userRepo.getUsersModelsWithDateActivityByPage(date, i, pageSize);
+                List<UserModel> users = new ArrayList<UserModel>(userRepo.getUsersModelsWithDateActivityByPage(date, i, pageSize));
                 date.getTime();
                 for(UserModel model : users){
                     String content = model.getActivities().toString()

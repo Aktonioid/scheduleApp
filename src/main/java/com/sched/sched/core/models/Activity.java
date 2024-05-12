@@ -6,6 +6,8 @@ import java.util.UUID;
 
 import org.hibernate.type.YesNoConverter;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
@@ -46,6 +48,7 @@ public class Activity {
     private LocalTime activityTime; // время когда мероприятие проводиться
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
+    @JsonBackReference
     private UserModel user;
     @Convert(converter = YesNoConverter.class)
     @Column(name = "is_activity_completed")

@@ -5,6 +5,8 @@ import java.util.UUID;
 
 import org.hibernate.type.YesNoConverter;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
@@ -40,6 +42,7 @@ public class Habit {
     // пользователь к которому эта привычка относиться
     @ManyToOne
     @JoinColumn(name = "user_id")
+    @JsonBackReference
     private UserModel user;
     @Column(name="today_success")
     @Convert(converter = YesNoConverter.class)

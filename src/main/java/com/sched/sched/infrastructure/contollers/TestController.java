@@ -1,5 +1,10 @@
 package com.sched.sched.infrastructure.contollers;
 
+import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.util.Date;
+import java.util.Set;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -48,11 +53,18 @@ public class TestController {
     }
 
     @GetMapping("/test")
-    public ResponseEntity<String> Test(HttpServletRequest req){
-        
-        System.out.println(req.getAttribute("Auth"));
-        System.out.println(req.getAuthType());
-        System.out.println(req.getCookies()[0]);
-        return ResponseEntity.ok(req.getCookies().toString());
+    public ResponseEntity<Set<UserModel>> Test(HttpServletRequest req){
+        Date date = Date.from(Instant.ofEpochMilli(1714165200000l));
+
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+
+        System.out.println(format.format(date));
+
+        // userRepo.getUsersPageCount(10, true, date);
+        userRepo.getUsersModelsWithDateActivityByPage(date, 1, 10);
+        // userRepo.getUsersModelsWithDateHabitByPage(date, 1, 10);
+
+
+        return ResponseEntity.ok(userRepo.getUsersModelsWithDateActivityByPage(date, 1, 10));
     }
 }

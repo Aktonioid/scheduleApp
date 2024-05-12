@@ -2,7 +2,9 @@ package com.sched.sched.infrastructure.repos;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
@@ -213,36 +215,32 @@ public class UserRepo implements IUserRepo{
     @Override
     // получение пользователей с активностями на день по странице pageSize присылается при вызове метода
     // page size рекомендуется делать одинковыми для данного метода и метода получения колличества страниц(если используется)
-    public List<UserModel> getUsersModelsWithDateActivityByPage(Date date, int page, int pageSize) {
+    public Set<UserModel> getUsersModelsWithDateActivityByPage(Date date, int page, int pageSize) {
         Session session = sessionFactory.openSession();
         CriteriaBuilder cb = session.getCriteriaBuilder();
         CriteriaQuery<UserModel> cq = cb.createQuery(UserModel.class);
         Root<UserModel> root = cq.from(UserModel.class);
         
-        cq.multiselect(root.get("id"),
-                    root.get("email"), 
-                    root.get("activities"));
-
-
-        Subquery<Activity> subQuery = cq.subquery(Activity.class); // subquery для того чтобы получать только тех пользователей,
-                                                                    // у котороых есть активности на сегодняшнюю дату
-
+        Subquery<UUID> subQuery = cq.subquery(UUID.class); // subquery для того чтобы получать только тех пользователей,
+                                                                // у котороых есть активности на сегодняшнюю дату
         Root<Activity> subRoot = subQuery.from(Activity.class);
 
         // subquery для фильтрации запросов по наличию активностей на день
-        subQuery.select(subRoot);
-        subQuery.where(root.get("activityDate").in(date));
+        subQuery.select(subRoot.get("id"));
+        subQuery.where(
+            cb.and(cb.equal(subRoot.<Date>get("activityDate"), date)));
+        //
         
-
         // query для получения пользователей по subquery
-        cq.where(root.get("activities").in(subQuery));
-        
+        cq.select(root);
+        cq.where(root.get("activities").get("id").in(subQuery));
+
         Query<UserModel> query = session.createQuery(cq);
         
         query.setFirstResult((page - 1) * pageSize); 
         query.setMaxResults(pageSize);
 
-        List<UserModel> users = query.getResultList();
+        Set<UserModel> users = query.getResultList().stream().collect(Collectors.toSet());
         
         session.close();
         return users;
@@ -251,23 +249,31 @@ public class UserRepo implements IUserRepo{
     @Override
     // получение пользователей с привычками на день по страницам со страницами размерами страницы равной pageSize( посылается при вызове метода)
     // page size рекомендуется делать одинковыми для данного метода и метода получения колличества страниц(если используется)
-    public List<UserModel> getUsersModelsWithDateHabitByPage(Date date, int page, int pageSize) {
+    public Set<UserModel> getUsersModelsWithDateHabitByPage(Date date, int page, int pageSize) {
         Session session = sessionFactory.openSession();
         CriteriaBuilder cb = session.getCriteriaBuilder();
         CriteriaQuery<UserModel> cq = cb.createQuery(UserModel.class);
         Root<UserModel> root = cq.from(UserModel.class);
 
-        cq.multiselect(root.get("id"),
-                    root.get("email"), 
-                    root.get("activities"));
+        // subquery для введения ограничений привычек 
+        Subquery<UUID> subquery = cq.subquery(UUID.class);
+        Root<Habit> habitRoot = subquery.from(Habit.class);
 
+        subquery.select(habitRoot.get("id"));
+        subquery.where(cb.and(
+            cb.lessThanOrEqualTo(root.get("habitBeginingDate"), date.getTime()),  
+            cb.greaterThanOrEqualTo(root.get("habitExpirationDate"), date.getTime())
+        ));
+
+        cq.select(root);
+        cq.where(cb.equal(root.get("habits").get("id"), subquery));
 
         Query<UserModel> query = session.createQuery(cq);
 
         query.setFirstResult((page - 1) * pageSize); 
         query.setMaxResults(pageSize);
 
-        List<UserModel> users = query.getResultList();
+        Set<UserModel> users = query.getResultList().stream().collect(Collectors.toSet());
 
         session.close();
         return users;
@@ -281,34 +287,35 @@ public class UserRepo implements IUserRepo{
         CriteriaBuilder cb = session.getCriteriaBuilder();
         CriteriaQuery<Long> countQuery = cb.createQuery(Long.class);
         Root<UserModel> root = countQuery.from(UserModel.class);
-
-
+        
         countQuery.select(cb.count(root));
 
         // если получение страниц по активностям
         if(isActivity){
             // subquery для получения страниц польщователей у которых есть активности на сегодня
-            Subquery<Activity> activityQuery = countQuery.subquery(Activity.class);
+            Subquery<UUID> activityQuery = countQuery.subquery(UUID.class);
             Root<Activity> activityRoot = activityQuery.from(Activity.class);
             
-            activityQuery.select(activityRoot);
-            activityQuery.where(activityRoot.get("activityDate").in(date));
+            activityQuery.select(activityRoot.get("id"));
+            activityQuery.where(cb.equal(activityRoot.<Date>get("activityDate"), date));
             
-            countQuery.where(root.get("activities").in(activityQuery));
+            countQuery.where(root.get("activities").get("id").in(activityQuery));
         }
         // Если получение страниц по привычкам
-        else{
+        else if(!isActivity){
             // subquery для получения страниц польщователей у которых есть привычки на сегодня
-            Subquery<Habit> habitQuery = countQuery.subquery(Habit.class);
+            Subquery<UUID> habitQuery = countQuery.subquery(UUID.class);
             Root<Habit> habitRoot = habitQuery.from(Habit.class);
             
-            habitQuery.select(habitRoot);
+            habitQuery.select(habitRoot.get("id"));
             habitQuery.where(cb.and(
-                cb.ge(root.get("habitBeginingDate"), date.getTime()),  
-                cb.le(root.get("habitExpirationDate"), date.getTime())
-                // cb.gt(root.get("habitBeginingDate"), date)
+                cb.lessThanOrEqualTo(root.get("habitBeginingDate"), date.getTime()),  
+                cb.greaterThanOrEqualTo(root.get("habitExpirationDate"), date.getTime())
             ));
+
+            countQuery.where(cb.equal(root.get("habits").get("id"), habitQuery));
         }
+
 
         //Колличество пользователей, подходяших под описание
         long usersCount = session.createQuery(countQuery).uniqueResult();
@@ -328,13 +335,13 @@ public class UserRepo implements IUserRepo{
     @Override
     // получаем сколько пользователей по n страниц можно получить. Вообще всех пользователей
     public int getUsersPageCount(int pageSize) {
-        // TODO надо проверить как эта ебала работает просто я как-то не уверен, что оно будет корректно получать инфу
         Session session = sessionFactory.openSession();
 
         CriteriaBuilder cb = session.getCriteriaBuilder();
         CriteriaQuery<Long> countQuery = cb.createQuery(Long.class);
-        // Root<UserModel> root = countQuery.from(UserModel.class);
+        Root<UserModel> root = countQuery.from(UserModel.class);
 
+        countQuery.select(cb.count(root));
 
         long usersCount = session.createQuery(countQuery).uniqueResult();
 
