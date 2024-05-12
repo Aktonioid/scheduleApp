@@ -3,9 +3,10 @@ package com.sched.sched;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.text.SimpleDateFormat;
+import java.time.Instant;
 import java.util.Date;
 import java.util.UUID;
-import java.util.List;
+import java.util.Set;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Tag;
@@ -162,11 +163,45 @@ public class UserRepoTests {
 
     assertEquals(true, reslut);
   }
-  
-  public void UserRepo_getUsersPageCount1(){
+  @Test
+  public void UserRepo_getUsersPageCountByActivities(){
+    Date date = Date.from(Instant.ofEpochMilli(1714424400000L));
+    int pages = repo.getUsersPageCount(10, true, date);
+
+    assertEquals(true, pages > 0);
+  }
+
+  public void UserRepo_getUsersPageCountByHabits(){
+    Date date = Date.from(Instant.ofEpochMilli(1714165200000l));
+    int pages = repo.getUsersPageCount(10, false, date);
+
+    assertEquals(true, pages > 0);
   }
   
-  public void UserRepo_getUsersPageCount2(){
+  @Test
+  public void UserRepo_getUsersPageCount(){
+    int pages = repo.getUsersPageCount(10);
+
+    assertEquals(true, pages > 0);
+  }
+  
+  @Test
+  public void UserRepo_getUsersModelsWithDateActivityByPage(){
+
+    Date date = Date.from(Instant.ofEpochMilli(1714424400000L));
+    
+    Set<UserModel> models = repo.getUsersModelsWithDateActivityByPage(date, 1, 10);
+    
+    assertEquals(true, models.size() > 0);
+  }
+
+  public void UserRepo_getUsersModelsWithDateHabitsByPage(){
+    
+    Date date = Date.from(Instant.ofEpochMilli(1714424400000L));
+
+    Set<UserModel> models = repo.getUsersModelsWithDateHabitByPage(date, 1, 10);
+
+    assertEquals(true, models.size() > 0);
   }
   
   @Test

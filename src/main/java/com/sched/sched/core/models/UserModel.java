@@ -9,7 +9,8 @@ import org.hibernate.type.YesNoConverter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import jakarta.persistence.CascadeType;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
@@ -17,15 +18,17 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
 @Getter
 @Setter
 @AllArgsConstructor
-@NoArgsConstructor
+// @NoArgsConstructor
+@RequiredArgsConstructor(access = AccessLevel.PUBLIC)
 @Entity
 @Table(name = "user_table")
 public class UserModel implements UserDetails{
@@ -46,12 +49,14 @@ public class UserModel implements UserDetails{
     private boolean isRegisterCompleted;
     
     // Активности(Ивенты?) которые есть у пользователя(по типу похода к врачу)
-    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    // @JoinColumn(name = "activity_id")
+    @JsonManagedReference
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "user")
+    // @Column
     private Set<Activity> activities;
-    // привычки, ктороыве пользователь хочет привить 
-    @OneToMany(fetch = FetchType.EAGER)
-    // @JoinColumn(name="habit_id")
+    // привычки, ктороыве пользователь хочет привить
+    @JsonManagedReference 
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "user")
+    // @Column
     private Set<Habit> habits;
 
     // // общая стата пользователя
@@ -61,6 +66,23 @@ public class UserModel implements UserDetails{
     // @Column(name = "failure_habbits")
     // private int faliureHabits; // сколько раз пользователь не выполнил цели по привычке (за день) 
     
+    // public UserModel(UUID id, Set<Habit> habits, String email){
+    //     this.email = email;
+    //     this.id = id;
+    //     this.habits = habits;
+    // }
+
+    public UserModel(UUID id, String email, Set<Activity> activities){
+        this.id = id;
+        this.activities = activities;
+        this.email = email;
+    }
+
+    // public UserModel(UUID id, Set<Activity> activities, String email){
+    //     this.id = id;
+    //     this.activities = activities;
+    //     this.email = email;
+    // }
     
     public UserModel(UUID id){
         this.id = id;

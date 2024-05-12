@@ -171,6 +171,7 @@ public class ActivityController {
         
         Date date = new Date(timestamp);
 
+
         List<ActivityDto> activities = null;
         
         try {

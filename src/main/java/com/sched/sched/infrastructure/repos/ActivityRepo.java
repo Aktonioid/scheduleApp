@@ -230,7 +230,7 @@ public class ActivityRepo implements IActivityRepo{
         cq.select(root);
         // посик по записям где id пользователя равно userId и activityDate равен date
         cq.where(cb.and(
-            cb.equal(subRoot.get("user"), subquery),
+            cb.equal(root.get("user"), subquery),
             cb.equal(root.<Date>get("activityDate"), date)));
 
         List<Activity> activities = session.createQuery(cq).getResultList();
